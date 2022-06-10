@@ -84,19 +84,9 @@ class Trainer:
 
     def do_training(self):
 
-        #print('Step 1 --------------------------------------------')
-        #step1(self.args, self.feature_extractor, self.rot_cls, self.obj_cls, self.source_loader, self.device)
+        print('Step 1 --------------------------------------------')
+        step1(self.args, self.feature_extractor, self.rot_cls, self.obj_cls, self.source_loader, self.device)
         
-        #torch.save(self.feature_extractor, 'drive/My Drive/Colab Notebooks/Model/feature_AR.pt')
-        #torch.save(self.obj_classifier, 'drive/My Drive/Colab Notebooks/Model/classifier_AR.pt')
-        #torch.save(self.rot_classifier, 'drive/My Drive/Colab Notebooks/Model/rotational_AR.pt')
-
-        print('Loading model...')
-        self.feature_extractor = torch.load('drive/My Drive/Colab Notebooks/Model/feature_AR.pt')
-        self.obj_cls = torch.load('drive/My Drive/Colab Notebooks/Model/classifier_AR.pt')
-        self.rot_cls = torch.load('drive/My Drive/Colab Notebooks/Model/rotational_AR.pt')
-        print('Model loaded successfully :)')
-
         print('\nTarget - Evaluation -- for known/unknown separation')
         rand = evaluation(self.args, self.feature_extractor, self.rot_cls, self.target_loader_eval, self.device)
         

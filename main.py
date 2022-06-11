@@ -104,7 +104,7 @@ class Trainer:
         self.target_loader_train = data_helper.get_train_dataloader(self.args, target_path_file)
         self.target_loader_eval = data_helper.get_val_dataloader(self.args, target_path_file_eval)
 
-        print('Step 2 --------------------------------------------')
+        print('\nStep 2 --------------------------------------------')
         step2(self.args, self.feature_extractor, self.rot_cls, self.obj_cls, self.source_loader,
               self.target_loader_train, self.target_loader_eval, self.device)
 

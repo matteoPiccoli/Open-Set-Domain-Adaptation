@@ -146,6 +146,6 @@ def step2(args, feature_extractor, rot_cls, obj_cls, source_loader, target_loade
 
   for epoch in range(args.epochs_step2):
     
-    #print('Epoch: ', epoch)
+    if (epoch%10==0 or epoch==args.epochs_step2-1): print('Epoch: ', epoch)
     _do_epoch(args,epoch,feature_extractor,rot_cls,obj_cls,source_loader,target_loader_train,target_loader_eval,optimizer,device)
     scheduler.step()

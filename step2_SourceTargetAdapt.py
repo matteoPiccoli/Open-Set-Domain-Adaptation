@@ -19,9 +19,7 @@ def _do_epoch(args, epoch, feature_extractor, rot_cls, obj_cls, source_loader, t
     net = feature_extractor.to(device)
 
     # Variables initialization (accuracy computation)
-    total_cls = 0
     correct_cls = 0
-    total_rot = 0
     correct_rot = 0
     
     target_loader_train = cycle(target_loader_train)
@@ -74,19 +72,13 @@ def _do_epoch(args, epoch, feature_extractor, rot_cls, obj_cls, source_loader, t
 
         # Counting correctly classified samples
         for (i, j, k, l) in zip(cls_pred, class_l_source, rot_pred, rot_l_target):
-          correct_cls += (i == j)
-          correct_rot += (k == l)
-
-        # Total samples (summing up a batch at a time)
-        total_cls += class_l_source.size(0)
-        total_rot += rot_l_target.size(0)
+          correct_cls += (i == j).item()
+          correct_rot += (k == l).item()
 
     # Accuracy computation
-    correct_cls = correct_cls.cpu().numpy()
-    correct_rot = correct_rot.cpu().numpy()
-    acc_cls = 100 * correct_cls / total_cls
-    acc_rot = 100 * correct_rot / total_rot
-
+    acc_cls = 100 * np.asarray(correct_cls, dtype="float32")/ np.asarray(source_loader.dataset.__len__(), dtype="float32")
+    acc_rot = 100 * np.asarray(correct_rot, dtype="float32")/ np.asarray(source_loader.dataset.__len__(), dtype="float32")
+    
 
     #-----------------------------------#
     #            Evaluation             #  
@@ -120,24 +112,26 @@ def _do_epoch(args, epoch, feature_extractor, rot_cls, obj_cls, source_loader, t
               # and total number of samples
               for (i, j) in zip(cls_pred, class_l):
                   if (class_l >= args.n_classes_known):
-                      correct_unknown += (i == 45)
+                      correct_unknown += (i == 45).item()
                       total_unknown += 1
                   else:
-                      correct_known += (i == j)
+                      correct_known += (i == j).item()
                       total_known += 1
 
         # Computing OS*, UNK and HOS
-        correct_known = correct_known.cpu().numpy()
-        correct_unknown = correct_unknown.cpu().numpy()
+        correct_known = np.asarray(correct_known, dtype="float32")
+        correct_unknown = np.asarray(correct_unknown, dtype="float32")
+        total_known = np.asarray(total_known, dtype="float32")
+        total_unknown = np.asarray(total_unknown, dtype="float32")
         OS_star = correct_known / total_known
         UNK = correct_unknown / total_unknown
         HOS = 2 *(OS_star * UNK)/(OS_star + UNK)
 
+        print("Class Loss %.4f, Class Accuracy %.4f, Rot Loss %.4f, Rot Accuracy %.4f" % (class_loss.item(), acc_cls, rot_loss.item(), acc_rot))
         print("OS* = %.4f" % OS_star)
         print("UNK = %.4f" % UNK)
         print("HOS = %.4f\n" % HOS)
-        print("Class Loss %.4f, Class Accuracy %.4f, Rot Loss %.4f, Rot Accuracy %.4f" % (class_loss.item(), acc_cls, rot_loss.item(), acc_rot))
-    
+        
 
 def step2(args, feature_extractor, rot_cls, obj_cls, source_loader, target_loader_train, target_loader_eval, device):
   

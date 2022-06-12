@@ -93,6 +93,11 @@ def evaluation(args, feature_extractor, rot_cls, target_loader_eval, device):
             
             ent_score.append(entropy_loss(ent_rot, args.is_multi, args.n_classes_known).item())
 
+    # Transform to float32
+    ground_truth = np.asarray(ground_truth, dtype="float32")
+    rot_score = np.asarray(rot_score, dtype="float32")
+    ent_score = np.asarray(ent_score, dtype="float32")
+
     # Normalization of the entropy score
     raw = ent_score
     min_raw = min(raw)
@@ -150,6 +155,8 @@ def evaluation(args, feature_extractor, rot_cls, target_loader_eval, device):
             target_unknown.write(target_file_names[count] + ' ' + str(args.n_classes_known) + '\n')
             number_of_unknown_samples += 1
     
+    normality_score = np.asarray(normality_score, dtype="float32")
+
     # AUROC metric
     auroc = roc_auc_score(ground_truth, normality_score)
     print('AUROC %.4f' % auroc)

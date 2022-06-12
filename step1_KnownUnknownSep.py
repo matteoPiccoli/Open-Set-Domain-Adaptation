@@ -3,6 +3,7 @@ from torch import nn
 from center_loss import CenterLoss
 from optimizer_helper import get_optim_and_scheduler
 from matplotlib import pyplot as plt
+import numpy as np
 
 
 # Implement Step1
@@ -76,14 +77,12 @@ def do_epoch(args, feature_extractor, rot_cls, obj_cls, source_loader, optimizer
 
         # Counting correctly classified samples
         for (i, j, k, l) in zip(cls_pred, class_l, rot_pred, rot_l):
-          correct_cls += (i == j)
-          correct_rot += (k == l)
+          correct_cls += (i == j).item()
+          correct_rot += (k == l).item()
         
-    # Accuracy and mean loss computation
-    correct_cls = correct_cls.cpu().numpy()
-    correct_rot = correct_rot.cpu().numpy()
-    acc_cls = 100 * correct_cls / source_loader.dataset.__len__()
-    acc_rot = 100 * correct_rot / source_loader.dataset.__len__()
+    # Accuracy computation
+    acc_cls = 100 * np.asarray(correct_cls, dtype="float32")/ np.asarray(source_loader.dataset.__len__(), dtype="float32")
+    acc_rot = 100 * np.asarray(correct_rot, dtype="float32")/ np.asarray(source_loader.dataset.__len__(), dtype="float32")
         
     return class_loss, acc_cls, rot_loss, acc_rot, cen_loss
 
